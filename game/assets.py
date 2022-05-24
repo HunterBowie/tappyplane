@@ -19,6 +19,10 @@ IMAGES = {
     "rock-snow-down": windowgui.load_image("rockSnowDown", IMAGES_DIR),
     "cursor": windowgui.load_image("UI/tap", IMAGES_DIR),
     "cursor-pressed": windowgui.load_image("UI/tapTick", IMAGES_DIR),
+    "ground-rock": windowgui.load_image("groundDirt", IMAGES_DIR),
+    "ground-snow": windowgui.load_image("groundSnow", IMAGES_DIR),
+    "ground-grass": windowgui.load_image("groundGrass", IMAGES_DIR),
+    "ground-ice": windowgui.load_image("groundIce", IMAGES_DIR),
 
 }
 

@@ -3,33 +3,57 @@ import windowgui
 import assets, constants
 
 class Rock:
-    IMAGES = [
-        "rock-grass-up",
-        "rock-grass-down",
-        "rock-up",
-        "rock-down",
-        "rock-ice-up",
-        "rock-ice-down",
-        "rock-snow-up",
-        "rock-snow-down"
-    ]
-    def __init__(self):
-        self.x = random.randint(constants.WIDTH, constants.WIDTH+constants.ROCK_X_DIST)
+    IMAGES = {
+        "snow": {
+            "up": [
+                "rock-up",
+                "rock-snow-up",
+            ],
+            "down":[
+                "rock-down",
+                "rock-snow-down"
+            ]
+        },
+        "grass": {
+            "up": [
+                "rock-up",
+                "rock-grass-up",
+            ],
+            "down": [
+                "rock-down",
+                "rock-grass-down",
+            ]
+        },
+        "ice": {
+            "up": [
+                "rock-ice-up"
+            ],
+            "down": [
+                "rock-ice-down"
+            ]
+        }
+        
+        
+    }
+    def __init__(self, theme, size, direction, x_offset=0):
+        self.direction = direction
+        self.size = size
+        self.theme = theme
+        self.x = constants.WIDTH+100+x_offset
         self.passed_screen = False
         self._init_image()
         self.mask = pygame.mask.from_surface(self.image)
     
     def _init_image(self):
-        image_name = random.choice(self.IMAGES)
+        image_name = random.choice(self.IMAGES[self.theme][self.direction])
         self.image = assets.IMAGES[image_name]
-        self.spike_size = random.choice(["low", "tall"])
-        if image_name[-2:] == "up":
-            if self.spike_size == "low":
+        if self.direction == "up":
+            if self.size == "small":
                 self.y = constants.HEIGHT-self.image.get_height()//2
             else:
                 self.y = constants.HEIGHT-self.image.get_height()+5
         else:
-            if self.spike_size == "low":
+            if self.size == "small":
                 self.y = -self.image.get_height()//2
             else:
                 self.y = -5

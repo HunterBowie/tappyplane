@@ -1,7 +1,8 @@
 import constants
 
 class ScrollingImage:
-    def __init__(self, image):
+    def __init__(self, y, image):
+        self.y = y
         self.x1 = 0
         self.x2 = image.get_width()
         self.image = image
@@ -14,5 +15,5 @@ class ScrollingImage:
             self.x1, self.x2, = self.x2, self.x1
     
     def render(self, screen):
-        screen.blit(self.image, (self.x1, 0))
-        screen.blit(self.image, (self.x2, 0))
+        screen.blit(self.image, (self.x1, self.y))
+        screen.blit(self.image, (self.x2, self.y))

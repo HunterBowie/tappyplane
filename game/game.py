@@ -1,7 +1,8 @@
-import pygame
+import pygame, random
 import windowgui
 import constants, assets
 from scrolling_image import ScrollingImage
+from ground import Ground
 from plane import Plane
 from rock import Rock
 
@@ -14,31 +15,46 @@ assets.convert_images()
 class Game:
     def __init__(self, window):
         self.window = window
+        self.background = ScrollingImage(0, assets.IMAGES["background"])
+        self.ground = Ground("snow")
         pygame.mouse.set_visible(False)
-        self.background = ScrollingImage(assets.IMAGES["background"])
+        
         self.plane = Plane()
-        self.cursor_timer = windowgui.Timer()
-        
         self.rocks = []
-        for i in range(4):
-            self.new_rock()
+        self.theme = "snow"
+        self.theme_timer = windowgui.Timer()
+        self.theme_timer.start()
+        self.difficulty = 1
+        self.difficulty_timer = windowgui.Timer()
+        self.difficulty_timer.start()
         
+
+        self.rock_timer = windowgui.Timer()
+        self.rock_timer.start()
+        self.cursor_timer = windowgui.Timer()
+
+        self._generate_rock_pair()
+    
+    def _new_theme(self):
+        changed = False
+        prev_theme = self.theme
+        while not changed:
+            self.theme = random.choice(constants.THEMES)
+            if self.theme != prev_theme:
+                changed = True
         
-    def new_rock(self):
-        finished = False
-        counter = 0
-        while not finished:
-            new_rock = Rock()
-            finished = True
-            for rock in self.rocks:
-                if rock.get_rect().colliderect(new_rock.get_rect()):
-                    finished = False
-            if finished:
-                self.rocks.append(new_rock)
-          
-            counter += 1
-            if counter > 20:
-                raise Exception("rock cannot be added")
+        self.ground.change_theme(self.theme)
+   
+    def _generate_rock_pair(self):
+        top_rock = Rock(self.theme, "small", "up", x_offset=(-100+self.difficulty))
+        bottom_rock = Rock(self.theme, "large", "down", x_offset=(100-self.difficulty))
+        if random.randint(0, 1):
+            top_rock = Rock(self.theme, "small", "down", x_offset=(-100+self.difficulty))
+            bottom_rock = Rock(self.theme, "large", "up", x_offset=(100-self.difficulty))
+        
+        self.rocks.append(top_rock)
+        self.rocks.append(bottom_rock)
+        
     
     def update(self):
         mouse_pos = pygame.mouse.get_pos()
@@ -52,6 +68,19 @@ class Game:
         self.background.update()
         self.background.render(self.window.screen)
 
+        if self.theme_timer.passed(10):
+            self._new_theme()
+            self.theme_timer.start()
+
+        if self.difficulty_timer.passed(10):
+            self.difficulty += 4
+            self.difficulty_timer.start()
+
+
+        if self.rock_timer.passed(2):
+            self._generate_rock_pair()
+            self.rock_timer.start()
+
         remove_rocks = []
         for rock in self.rocks:
             rock.update()
@@ -61,7 +90,10 @@ class Game:
         
         for rock in remove_rocks:
             self.rocks.remove(rock)
-            self.new_rock()
+        
+        self.ground.update()
+        self.ground.render(self.window.screen)
+        
         
         self.plane.update()
         if self.plane.colliderocks(self.rocks):
