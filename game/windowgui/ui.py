@@ -5,7 +5,7 @@ A collection of UI elements to use with the UI manager.
 import pygame, pyperclip, math
 from numpy import interp
 from .assets import get_button_img, get_checkbox_img, get_slider_image
-from .util import render_border, Text, get_text_size, RealTimer
+from .util import render_border, Text, get_text_size, Timer
 from .constants import Colors, TEXTBOX_BACKSPACE_DELAY, TEXTBOX_BORDER_WIDTH, TEXTBOX_CURSOR_BLINK_TIME,\
 TEXTBOX_MARGIN, TEXTBOX_SHIFT_CHARS, UIEvent, UIColorStyle, SLIDER_HELD_DIST_X, SLIDER_HELD_DIST_Y, \
 TEXTBOX_BACKSPACE_START_DELAY
@@ -146,10 +146,10 @@ class TextBox(UIElement):
         self.selected = False
         self._border_size = border_size
         self._cursor_blink = True
-        self._cursor_timer = RealTimer()
+        self._cursor_timer = Timer()
         self._cursor_timer.start()
-        self._backspace_timer = RealTimer()
-        self._held_backspace_timer = RealTimer()
+        self._backspace_timer = Timer()
+        self._held_backspace_timer = Timer()
 
 
     def is_appendable(self, string):

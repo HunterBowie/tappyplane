@@ -1,5 +1,5 @@
 import pygame
-from .util import RealTimer
+from .util import Timer
 from .constants import FLASH_FADE_SPEED, FLASH_FADE_TIME
 
 class Flash:
@@ -16,7 +16,7 @@ class Flash:
         self.color = color
         self._surf_init()
 
-        self.timer = RealTimer()
+        self.timer = Timer()
         self.duration = duration
     
     def start(self):

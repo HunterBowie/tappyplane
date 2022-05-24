@@ -115,7 +115,7 @@ def get_text_size(string, style=Text.default_style):
     return surf.get_width(), surf.get_height()
 
 
-class RealTimer:
+class Timer:
     """
     A class for calculating time in seconds.
     """
@@ -138,6 +138,7 @@ class RealTimer:
         self.start_time = -1
         self.stop_time = -1
 
+
     def stop(self):
         self.stop_time = time.monotonic()
     
@@ -156,29 +157,14 @@ class RealTimer:
     
     def __repr__(self):
         return f"time: {self.get()}"
-    
 
-class GameTimer:
-    """
-    A class for calculating time in pygame ticks.
-    """
-    def __init__(self):
-        self.reset()
-    
-    def start(self):
-        self.start_time = pygame.time.get_ticks()
-    
-    def get(self):
-        if self.start_time == -1:
-            return 0
-        now = pygame.time.get_ticks()
-        return int(now-self.start_time)
-    
-    def reset(self):
-        self.start_time = -1
-    
-    def passed(self, seconds):
-        return self.get() >= seconds
+
+def rotate_image(image, rect, angle):
+        """rotate an image while keeping its center"""
+        rot_image = pygame.transform.rotate(image, angle)
+        y = rect.center[1]-rot_image.get_height()/2
+        x = rect.center[0]-rot_image.get_width()/2
+        return rot_image, (x, y)
 
 def get_surf(size, color, alpha):
     surf = pygame.Surface(size, pygame.SRCALPHA)
@@ -224,7 +210,7 @@ def root_rects(screen_size, rects, top=False, bottom=False,
         root_rect(screen_size, rect, top, bottom,
         left, right, center_x, center_y)
 
-def load_image(img_name, img_dir, ext=".png", colorkey=(0, 0, 0), convert=True, scale=None):
+def load_image(img_name, img_dir, ext=".png", colorkey=None, convert=False, scale=None):
     full_path = path.join(img_dir, img_name) + ext
     try:
         img = pygame.image.load(full_path)
