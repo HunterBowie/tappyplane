@@ -32,6 +32,9 @@ class Game:
         self.cursor_timer = windowgui.Timer()
         self._generate_rocks()
         self.score = 0
+        self.score_text = windowgui.Text(0, 40, "0", style={"size": 30})
+        self.score_text.x, self.score_text.y = windowgui.root_rect(window.screen.get_size(), self.score_text.get_rect(),
+        center_x=True)
     
     def config(self, plane_color=None):
         if plane_color:
@@ -94,6 +97,10 @@ class Game:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 self.plane.boost()
                 self.cursor_timer.start()
+            
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    self.plane.boost()
         
         self.background.update()
         self.background.render(self.window.screen)
@@ -130,6 +137,11 @@ class Game:
             return None
         
         self.plane.render(self.window.screen)
+
+        if self.score_text.string != str(self.score):
+            self.score_text.set(str(self.score))
+        surf = self.score_text.surface
+        pygame.display.set_icon(surf)
 
         if pygame.mouse.get_focused():
             cursor_image = assets.IMAGES["cursor"]
