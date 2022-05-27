@@ -1,6 +1,5 @@
 import random, pygame
-import windowgui
-import assets, constants
+import assets, constants, windowgui
 
 class Rock:
     IMAGES = {
@@ -39,8 +38,9 @@ class Rock:
         self.direction = direction
         self.size = size
         self.theme = theme
-        self.x = constants.WIDTH+100+x_offset
+        self.x = constants.WIDTH+constants.ROCK_X_DIST+x_offset
         self.passed_screen = False
+        self.passed_start = False
         self._init_image()
         self.mask = pygame.mask.from_surface(self.image)
     
@@ -67,6 +67,8 @@ class Rock:
         self.x -= constants.SCROLL_SPEED
         if self.x+self.image.get_width() < 0:
             self.passed_screen = True
+        elif self.x+self.image.get_width() < constants.WIDTH:
+            self.passed_start = True
 
     def render(self, screen):
         screen.blit(self.image, (self.x, self.y))

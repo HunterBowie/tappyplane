@@ -1,14 +1,11 @@
 import random, pygame
-import windowgui
-import constants, assets
+import constants, assets, windowgui
 
 class Plane:
-    IMAGE_NAMES = [
-        "plane-red"
-    ]
+    IMAGE_NAME = "plane-red"
+
     def __init__(self):
         self.image_frame = 1
-        self.image_name = random.choice(self.IMAGE_NAMES)
         self.mask = pygame.mask.from_surface(self.get_image())
         self.x = 50
         self.vel_y = 0
@@ -20,13 +17,13 @@ class Plane:
         self.frame_timer.start()
         self.angle_timer = windowgui.Timer()
     
-    def get_rect(self):
+    def get_static_rect(self):
         rect = self.mask.get_rect()
         rect.x, self.y = self.x, self.y
         return rect
     
     def get_image(self):
-        return assets.IMAGES[self.image_name + "-" + str(self.image_frame)]
+        return assets.IMAGES[self.IMAGE_NAME + "-" + str(self.image_frame)]
     
     def get_real_pos(self):
         return self.x+self.angle_offset[0], self.y+self.angle_offset[1]
@@ -38,6 +35,13 @@ class Plane:
             if rock.mask.overlap(self.mask, (int(x1-x2), int(y1-y2))):
                 return True
         return False
+    
+    def outside_screen(self):
+        rect = self.get_static_rect()
+        rect.x, rect.y = self.get_real_pos()
+        if rect.colliderect(pygame.Rect(0,0,constants.WIDTH,constants.HEIGHT)):
+            return False
+        return True
 
     def boost(self):
         self.vel_y = constants.PLANE_BOOST_VEL
@@ -69,6 +73,6 @@ class Plane:
 
     
     def render(self, screen):
-        image, self.angle_offset = windowgui.rotate_image(self.get_image(), self.get_rect(), self.angle)
+        image, self.angle_offset = windowgui.rotate_image(self.get_image(), self.get_static_rect(), self.angle)
         screen.blit(image, self.get_real_pos())
     

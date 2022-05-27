@@ -9,6 +9,15 @@ IMAGES = {
     "plane-red-1": windowgui.load_image("Planes/planeRed1", IMAGES_DIR),
     "plane-red-2": windowgui.load_image("Planes/planeRed2", IMAGES_DIR),
     "plane-red-3": windowgui.load_image("Planes/planeRed3", IMAGES_DIR),
+    "plane-green-1": windowgui.load_image("Planes/planeGreen1", IMAGES_DIR),
+    "plane-green-2": windowgui.load_image("Planes/planeGreen2", IMAGES_DIR),
+    "plane-green-3": windowgui.load_image("Planes/planeGreen3", IMAGES_DIR),
+    "plane-blue-1": windowgui.load_image("Planes/planeBlue1", IMAGES_DIR),
+    "plane-blue-2": windowgui.load_image("Planes/planeBlue2", IMAGES_DIR),
+    "plane-blue-3": windowgui.load_image("Planes/planeBlue3", IMAGES_DIR),
+    "plane-yellow-1": windowgui.load_image("Planes/planeYellow1", IMAGES_DIR),
+    "plane-yellow-2": windowgui.load_image("Planes/planeYellow2", IMAGES_DIR),
+    "plane-yellow-3": windowgui.load_image("Planes/planeYellow3", IMAGES_DIR),
     "rock-grass-up": windowgui.load_image("rockGrass", IMAGES_DIR),
     "rock-grass-down": windowgui.load_image("rockGrassDown", IMAGES_DIR),
     "rock-up": windowgui.load_image("rock", IMAGES_DIR),
@@ -23,6 +32,7 @@ IMAGES = {
     "ground-snow": windowgui.load_image("groundSnow", IMAGES_DIR),
     "ground-grass": windowgui.load_image("groundGrass", IMAGES_DIR),
     "ground-ice": windowgui.load_image("groundIce", IMAGES_DIR),
+    "game-over": windowgui.load_image("UI/textGameOver", IMAGES_DIR)
 
 }
 

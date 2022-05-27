@@ -1,8 +1,6 @@
-import pygame, random
-import windowgui
-import constants, assets
+import pygame, random, os
+import constants, assets, windowgui
 from scrolling_image import ScrollingImage
-from ground import Ground
 from plane import Plane
 from rock import Rock
 
@@ -12,28 +10,33 @@ pygame.display.set_caption("Tappy Plane")
 
 assets.convert_images()
 
+windowgui.Text.default_style["font_file"] = os.path.join(windowgui.assets.FOUNTS_DIR, "rounded.ttf")
+
 class Game:
     def __init__(self, window):
         self.window = window
+        self.running = False
         self.background = ScrollingImage(0, assets.IMAGES["background"])
-        self.ground = Ground("snow")
         pygame.mouse.set_visible(False)
         
         self.plane = Plane()
         self.rocks = []
+        self.last_spawned_rocks = []
+        self.last_spawned_rock_num = 0
         self.theme = "snow"
         self.theme_timer = windowgui.Timer()
         self.theme_timer.start()
         self.difficulty = 1
         self.difficulty_timer = windowgui.Timer()
         self.difficulty_timer.start()
-        
-
-        self.rock_timer = windowgui.Timer()
-        self.rock_timer.start()
         self.cursor_timer = windowgui.Timer()
-
-        self._generate_rock_pair()
+        self._generate_rocks()
+        self.score = 0
+    
+    def config(self, plane_color=None):
+        if plane_color:
+            Plane.IMAGE_NAME = "plane-" + plane_color
+        
     
     def _new_theme(self):
         changed = False
@@ -43,19 +46,46 @@ class Game:
             if self.theme != prev_theme:
                 changed = True
         
-        self.ground.change_theme(self.theme)
    
-    def _generate_rock_pair(self):
-        top_rock = Rock(self.theme, "small", "up", x_offset=(-100+self.difficulty))
-        bottom_rock = Rock(self.theme, "large", "down", x_offset=(100-self.difficulty))
-        if random.randint(0, 1):
-            top_rock = Rock(self.theme, "small", "down", x_offset=(-100+self.difficulty))
-            bottom_rock = Rock(self.theme, "large", "up", x_offset=(100-self.difficulty))
-        
-        self.rocks.append(top_rock)
-        self.rocks.append(bottom_rock)
-        
-    
+    def _generate_rocks(self):
+        self.last_spawned_rocks.clear()
+        choices = [1,1,1,1,2,2,2,2,3,4,5]
+        rand = random.choice(choices)
+        while rand == self.last_spawned_rock_num:
+            rand = random.choice(choices)
+        rocks = []
+        # small top, large bottom
+        if rand == 1:
+            rocks.append(Rock(self.theme, "small", "up", x_offset=(-100+self.difficulty)))
+            rocks.append(Rock(self.theme, "large", "down", x_offset=(100-self.difficulty)))
+        # large top, small bottom
+        elif rand == 2:
+            rocks.append(Rock(self.theme, "small", "down", x_offset=(-100+self.difficulty)))
+            rocks.append(Rock(self.theme, "large", "up", x_offset=(100-self.difficulty)))
+        # large bottom, 2 small bottom
+        elif rand == 3:
+            direction = random.choice(["down", "up"])
+            rocks.append(Rock(self.theme, "large", direction, x_offset=0))
+            rocks.append(Rock(self.theme, "small", direction, x_offset=-(75+20)))
+            rocks.append(Rock(self.theme, "small", direction, x_offset=75))
+        # large bottom, large top
+        elif rand == 4:
+            rocks.append(Rock(self.theme, "large", "down", x_offset=(-100+self.difficulty//2)))
+            rocks.append(Rock(self.theme, "large", "up", x_offset=(100-self.difficulty//2)))
+        # 3 large bottom
+        elif rand == 5:
+            first_direction = random.choice(["down", "up"])
+            second_direction = "down"
+            if first_direction == "down":
+                second_direction = "up"
+            rocks.append(Rock(self.theme, "small", first_direction, x_offset=random.randint(50, 100)))
+            rocks.append(Rock(self.theme, "small", first_direction, x_offset=-random.randint(50, 100)))
+            rocks.append(Rock(self.theme, "small", second_direction, x_offset=0))
+        for rock in rocks:
+            self.rocks.append(rock)
+            self.last_spawned_rocks.append(rock)
+        self.last_spawned_rock_num = rand
+
     def update(self):
         mouse_pos = pygame.mouse.get_pos()
         for event in pygame.event.get():
@@ -68,18 +98,20 @@ class Game:
         self.background.update()
         self.background.render(self.window.screen)
 
-        if self.theme_timer.passed(10):
+        if self.theme_timer.passed(20):
             self._new_theme()
             self.theme_timer.start()
 
-        if self.difficulty_timer.passed(10):
-            self.difficulty += 4
+        if self.difficulty_timer.passed(5):
+            self.difficulty += 2 
+            if self.difficulty > 80:
+                self.difficulty = 80
             self.difficulty_timer.start()
 
-
-        if self.rock_timer.passed(2):
-            self._generate_rock_pair()
-            self.rock_timer.start()
+        last_rocks_passed = [rock.passed_start for rock in self.last_spawned_rocks]
+        if all(last_rocks_passed):
+            self.score += 1
+            self._generate_rocks()
 
         remove_rocks = []
         for rock in self.rocks:
@@ -90,14 +122,11 @@ class Game:
         
         for rock in remove_rocks:
             self.rocks.remove(rock)
-        
-        self.ground.update()
-        self.ground.render(self.window.screen)
-        
+                
         
         self.plane.update()
-        if self.plane.colliderocks(self.rocks):
-            self.window.running = False
+        if self.plane.colliderocks(self.rocks) or self.plane.outside_screen():
+            self.running = False
             return None
         
         self.plane.render(self.window.screen)
@@ -116,8 +145,10 @@ class Game:
         self.window.update()
 
     def run(self):
-        while self.window.running:
+        self.running = True
+        while self.window.running and self.running:
             self.update()
+        pygame.mouse.set_visible(True)
 
 if __name__ == "__main__":
     window.start()

@@ -10,6 +10,6 @@ from .assets import IMAGES_DIR, SOUNDS_DIR, FOUNTS_DIR
 from .window import Window
 
 from .flash import Flash
-from .ui import Button, Slider, TextBox, CheckBox
+from .ui import Button, Slider, TextBox, CheckBox, TogglableButtonGroup
 
 

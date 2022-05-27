@@ -27,10 +27,9 @@ class Button(UIElement):
     """
     A UI element for togglable or non-togglable buttons.
     """
-    def __init__(self, id, x, y, width, height, color_style=UIColorStyle.WHITE, top_img=None, hide_button=False, togglable=False):
+    def __init__(self, id, x, y, width, height, color_style=UIColorStyle.WHITE, top_img=None, hide_button=False):
         super().__init__(id, x, y, width, height)
         self.clicked = False
-        self.togglable = togglable
         self.top_img = top_img
         self.hide_button = hide_button
         self.top_img_x = self.top_img_y = 0
@@ -40,37 +39,34 @@ class Button(UIElement):
             
         self._img_up = get_button_img(False, (width, height), color_style)
         self._img_down = get_button_img(True, (width, height-4), color_style)
+
+        self._force_down = False
     
     def eventloop(self, event):
         pos = pygame.mouse.get_pos()
         
         if event.type == pygame.MOUSEBUTTONDOWN:
             if self.rect.collidepoint(pos):
-                if self.togglable and self.clicked:
-                    self.clicked = False
-                else:
-                    self.clicked = True
+                self.clicked = True
                 self.post_event(UIEvent.BUTTON_CLICKED) 
-            
-            elif self.togglable:
-                self.clicked = False
+
     
     def update(self):
         pos = pygame.mouse.get_pos()
-        if not pygame.mouse.get_pressed() == (1, 0, 0) and self.clicked and not self.togglable:
+        if not pygame.mouse.get_pressed() == (1, 0, 0) and self.clicked:
             self.clicked = False
             self.post_event(UIEvent.BUTTON_RELEASED)
 
 
     def render(self, surface):
         if not self.hide_button:
-            if self.clicked:
+            if self.clicked or self._force_down:
                 surface.blit(self._img_down, self.rect.topleft)
             else:   
                 surface.blit(self._img_up, (self.rect.left, self.rect.top-4))
         
         if self.top_img:
-            if self.clicked:
+            if self.clicked or self._force_down:
                 surface.blit(self.top_img, (self.top_img_x+self.rect.x, self.top_img_y+self.rect.y))
             else:
                 surface.blit(self.top_img, (self.top_img_x+self.rect.x, self.top_img_y+self.rect.y-4))
@@ -277,6 +273,37 @@ class CheckBox(UIElement):
     def render(self, screen):
         screen.blit(self._image, self.rect.topleft)
 
+class TogglableButtonGroup:
+    """
+    A class for grouping and configuring buttons to be togglable with each other.
+    """
+    def __init__(self, buttons):
+        self.buttons = buttons
+        self.ids = [button.id for button in buttons]
+        self.selected = None
+    
+    def eventloop(self, event):
+        for button in self.buttons:
+            button.eventloop(event)
+        if event.type == UIEvent.BUTTON_CLICKED:
+            if event.ui_id in self.ids:
+                clicked_button = event.ui_element
+                clicked_button._force_down = True
+                for button in self.buttons:
+                    if button != clicked_button:
+                        button._force_down = False
+                self.selected = clicked_button
+        
+    def update(self):
+        for button in self.buttons:
+            button.update()
+
+    def render(self, screen):
+        for button in self.buttons:
+            button.render(screen)
+
+        
+
 
 class UIManager:
     """
@@ -286,11 +313,12 @@ class UIManager:
         self.window = window
         self.ui = []
     
-    def add(self, element):
-        self.ui.append(element)
+    def add(self, value):
+        if type(value) is list:
+            self.ui = self.ui + value
+        else:
+            self.ui.append(value)
     
-    def combine(self, elements):
-        self.ui = self.ui + elements
     
     def clear(self):
         self.ui = []
