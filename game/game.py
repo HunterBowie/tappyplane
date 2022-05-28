@@ -3,6 +3,7 @@ import constants, assets, windowgui
 from scrolling_image import ScrollingImage
 from plane import Plane
 from rock import Rock
+from util import get_number_image
 
 pygame.init()
 window = windowgui.Window((constants.WIDTH, constants.HEIGHT))
@@ -32,9 +33,6 @@ class Game:
         self.cursor_timer = windowgui.Timer()
         self._generate_rocks()
         self.score = 0
-        self.score_text = windowgui.Text(0, 40, "0", style={"size": 30})
-        self.score_text.x, self.score_text.y = windowgui.root_rect(window.screen.get_size(), self.score_text.get_rect(),
-        center_x=True)
     
     def config(self, plane_color=None):
         if plane_color:
@@ -138,10 +136,10 @@ class Game:
         
         self.plane.render(self.window.screen)
 
-        if self.score_text.string != str(self.score):
-            self.score_text.set(str(self.score))
-        surf = self.score_text.surface
-        pygame.display.set_icon(surf)
+        number_surf = get_number_image(self.score)
+        x = constants.WIDTH//2-number_surf.get_width()//2
+        y = 30
+        self.window.screen.blit(number_surf, (x, y))
 
         if pygame.mouse.get_focused():
             cursor_image = assets.IMAGES["cursor"]

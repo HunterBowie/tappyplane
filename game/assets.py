@@ -32,7 +32,19 @@ IMAGES = {
     "ground-snow": windowgui.load_image("groundSnow", IMAGES_DIR),
     "ground-grass": windowgui.load_image("groundGrass", IMAGES_DIR),
     "ground-ice": windowgui.load_image("groundIce", IMAGES_DIR),
-    "game-over": windowgui.load_image("UI/textGameOver", IMAGES_DIR)
+    "game-over": windowgui.load_image("UI/textGameOver", IMAGES_DIR),
+    "num-0": windowgui.load_image("Numbers/number0", IMAGES_DIR),
+    "num-1": windowgui.load_image("Numbers/number1", IMAGES_DIR),
+    "num-2": windowgui.load_image("Numbers/number2", IMAGES_DIR),
+    "num-3": windowgui.load_image("Numbers/number3", IMAGES_DIR),
+    "num-4": windowgui.load_image("Numbers/number4", IMAGES_DIR),
+    "num-5": windowgui.load_image("Numbers/number5", IMAGES_DIR),
+    "num-6": windowgui.load_image("Numbers/number6", IMAGES_DIR),
+    "num-7": windowgui.load_image("Numbers/number7", IMAGES_DIR),
+    "num-8": windowgui.load_image("Numbers/number8", IMAGES_DIR),
+    "num-9": windowgui.load_image("Numbers/number9", IMAGES_DIR),
+
+
 
 }
 

@@ -10,7 +10,7 @@ class MainMenu:
         self.title = windowgui.Text(0, 30, "Tappy Plane", style={"size": 45})
         self.title.x, self.title.y = windowgui.root_rect(self.window.screen.get_size(), self.title.get_rect(),
         center_x=True)
-        self.highscore = windowgui.Text(20,window.screen.get_height()-50, "Highscore: " + str(self.get_highscore()))
+        self.highscore = self.get_highscore()
     
     def get_highscore(self):
         with open(os.path.join(game.assets.CURRENT_DIR, "highscore.txt"), "r") as file:
@@ -58,14 +58,13 @@ class MainMenu:
                 new_game.run()
                 if new_game.score > self.get_highscore():
                     self.save_highscore(new_game.score)
-                    self.highscore.set("Highscore: " + str(new_game.score))
                 self.hide_text = False
                 self._init_ui()
     
     def update(self):
         if not self.hide_text:
             self.title.render(self.window.screen)
-            self.highscore.render(self.window.screen)
+            self.window.screen.blit(game.get_number_image(self.highscore, scale=0.5), (0,0))
 
 game.window.set_manager(MainMenu)
 game.window.start(auto_cycle=True)
