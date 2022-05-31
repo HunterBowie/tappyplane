@@ -1,4 +1,4 @@
-import constants
+import game.constants as constants
 
 class ScrollingImage:
     def __init__(self, y, image):

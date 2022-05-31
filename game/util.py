@@ -1,5 +1,5 @@
 import pygame
-import assets
+import game.assets as assets
 
 def get_number_image(value, scale=1):
     images = [

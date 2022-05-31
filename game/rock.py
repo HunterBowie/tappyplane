@@ -1,5 +1,7 @@
 import random, pygame
-import assets, constants, windowgui
+import game.constants as constants
+import game.assets as assets
+import windowgui
 
 class Rock:
     IMAGES = {

@@ -1,0 +1,1 @@
+CONFIG_FILE = "neat_config.txt"

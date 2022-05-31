@@ -1,5 +1,7 @@
 import random, pygame
-import constants, assets, windowgui
+import game.constants as constants
+import game.assets as assets
+import windowgui
 
 class Plane:
     IMAGE_NAME = "plane-red"

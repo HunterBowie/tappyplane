@@ -1,15 +1,19 @@
 import pygame, random, os
-import constants, assets, windowgui
-from scrolling_image import ScrollingImage
-from plane import Plane
-from rock import Rock
-from util import get_number_image
+import game.constants as constants
+import game.assets as assets
+import windowgui
+from game.scrolling_image import ScrollingImage
+from game.plane import Plane
+from game.rock import Rock
+from game.util import get_number_image
 
 pygame.init()
 window = windowgui.Window((constants.WIDTH, constants.HEIGHT))
 pygame.display.set_caption("Tappy Plane")
 
 assets.convert_images()
+
+pygame.display.set_icon(pygame.transform.scale(assets.IMAGES["plane-red-1"], (44, 35)))
 
 windowgui.Text.default_style["font_file"] = os.path.join(windowgui.assets.FOUNTS_DIR, "rounded.ttf")
 
@@ -20,7 +24,7 @@ class Game:
         self.background = ScrollingImage(0, assets.IMAGES["background"])
         pygame.mouse.set_visible(False)
         
-        self.plane = Plane()
+        self.planes = []
         self.rocks = []
         self.last_spawned_rocks = []
         self.last_spawned_rock_num = 0
@@ -33,11 +37,19 @@ class Game:
         self.cursor_timer = windowgui.Timer()
         self._generate_rocks()
         self.score = 0
+        self.config()
+        for i in range(self.num_planes):
+            self.planes.append(Plane())
     
-    def config(self, plane_color=None):
+    def config(self, plane_color="red", display_score=True, managed=False, num_planes=1):
         if plane_color:
             Plane.IMAGE_NAME = "plane-" + plane_color
-        
+        self.managed = managed
+        self.display_score = display_score
+        self.num_planes = num_planes
+    
+    def reset(self):
+        pass
     
     def _new_theme(self):
         changed = False
@@ -92,13 +104,16 @@ class Game:
         for event in pygame.event.get():
             self.window.eventloop(event)
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                self.plane.boost()
-                self.cursor_timer.start()
-            
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    self.plane.boost()
+            if not self.managed:
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    for plane in self.planes:
+                        plane.boost()
+                    self.cursor_timer.start()
+                
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        for plane in self.planes:
+                            plane.boost()
         
         self.background.update()
         self.background.render(self.window.screen)
@@ -129,17 +144,25 @@ class Game:
             self.rocks.remove(rock)
                 
         
-        self.plane.update()
-        if self.plane.colliderocks(self.rocks) or self.plane.outside_screen():
-            self.running = False
-            return None
+        for plane in self.planes:
+            plane.update()
+            if plane.colliderocks(self.rocks) or plane.outside_screen():
+                if self.managed:
+                    self.planes.remove(plane)
+                    if len(self.planes) == 0:
+                        self.running = False
+                else:
+                    self.running = False
+                    return None
         
-        self.plane.render(self.window.screen)
-
-        number_surf = get_number_image(self.score)
-        x = constants.WIDTH//2-number_surf.get_width()//2
-        y = 30
-        self.window.screen.blit(number_surf, (x, y))
+        for plane in self.planes:
+            plane.render(self.window.screen)
+         
+        if self.display_score:
+            number_surf = get_number_image(self.score)
+            x = constants.WIDTH//2-number_surf.get_width()//2
+            y = 30
+            self.window.screen.blit(number_surf, (x, y))
 
         if pygame.mouse.get_focused():
             cursor_image = assets.IMAGES["cursor"]
@@ -158,8 +181,7 @@ class Game:
         self.running = True
         while self.window.running and self.running:
             self.update()
+        self.end()
+        
+    def end(self):
         pygame.mouse.set_visible(True)
-
-if __name__ == "__main__":
-    window.start()
-    Game(window).run()
