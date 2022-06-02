@@ -123,8 +123,16 @@ class Timer:
         self.reset()
     
     def start(self):
+        """Sets the timer relative to now"""
         self.start_time = time.monotonic()
         self.stop_time = -1
+    
+    def reset(self):
+        self.start_time = -1
+        self.stop_time = -1
+
+    def stop(self):
+        self.stop_time = time.monotonic()
     
     def get(self):
         if self.start_time == -1:
@@ -134,13 +142,7 @@ class Timer:
 
         return self.stop_time-self.start_time
     
-    def reset(self):
-        self.start_time = -1
-        self.stop_time = -1
-
-
-    def stop(self):
-        self.stop_time = time.monotonic()
+    
     
     def passed(self, seconds):
         return self.get() >= seconds
