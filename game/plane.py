@@ -19,6 +19,7 @@ class Plane:
         self.frame_timer.start()
         self.angle_timer = windowgui.Timer()
     
+    
     def get_static_rect(self):
         rect = self.mask.get_rect()
         rect.x, self.y = self.x, self.y

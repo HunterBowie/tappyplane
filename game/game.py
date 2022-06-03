@@ -38,8 +38,7 @@ class Game:
         self._generate_rocks()
         self.score = 0
         self.config()
-        for i in range(self.num_planes):
-            self.planes.append(Plane())
+        
     
     def config(self, plane_color="red", display_score=True, managed=False, num_planes=1):
         if plane_color:
@@ -47,6 +46,9 @@ class Game:
         self.managed = managed
         self.display_score = display_score
         self.num_planes = num_planes
+        self.planes.clear()
+        for i in range(self.num_planes):
+            self.planes.append(Plane())
     
     def reset(self):
         pass

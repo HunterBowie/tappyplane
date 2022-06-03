@@ -1,4 +1,4 @@
-import pickle
+import pickle, os, neat
 import constants
 
 def init():
@@ -17,4 +17,4 @@ def save_genome(genome, file_name):
     pickle.dump(genome, open(file_name+".pickle", "w"))
 
 def load_genome(file_name):
-    return pick.load(open(file_name+".pickle", "r"))
+    return pickle.load(open(file_name+".pickle", "r"))

@@ -65,6 +65,15 @@ class Rock:
         rect.x, rect.y = self.x, self.y
         return rect
     
+    def colllidepoint(self, pos):
+        pos = pos[0]-self.x, pos[1]-self.y
+        if pos[0] < 0 or pos[1] < 0:
+            return False
+        if pos[0] > self.mask.get_size()[0] or pos[1] > self.mask.get_size()[1]:
+            return False
+        return self.mask.get_at(pos)
+
+    
     def update(self):
         self.x -= constants.SCROLL_SPEED
         if self.x+self.image.get_width() < 0:
