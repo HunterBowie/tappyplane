@@ -14,7 +14,7 @@ def init():
     return population
 
 def save_genome(genome, file_name):
-    pickle.dump(genome, open(file_name+".pickle", "w"))
+    pickle.dump(genome, open(file_name+".pickle", "wb"))
 
 def load_genome(file_name):
-    return pickle.load(open(file_name+".pickle", "r"))
+    return pickle.load(open(file_name+".pickle", "rb"))
