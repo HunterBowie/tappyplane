@@ -6,12 +6,12 @@ def fitness_function(genomes, config):
     new_game.config(display_score=False, managed=True, num_planes=50)
     for genome_id, genome in genomes:
         genome.fitness = 0
-    timer = windowgui.Timer()
-    timer.start()
-    network_timer = windowgui.Timer()
-    network_timer.start()
 
-    active_genomes = {genome: plane for _,genome in genomes for plane in new_game.planes}
+
+    active_genomes = {}
+    print(len(new_game.planes), len(genomes))
+    for i in range(50):
+        active_genomes[genomes[i][1]] = new_game.planes[i]
     new_game.running = True
     while new_game.running and game.window.running:
         
@@ -23,22 +23,31 @@ def fitness_function(genomes, config):
     
         for genome in dead_genomes:
             del active_genomes[genome]
-            print("removed")
+            
+        for genome, plane in active_genomes.items():
+            genome.fitness += 1/game.window.max_fps
 
-        if timer.passed(.1):
-            for genome, plane in active_genomes.items():
-                genome.fitness += .1
-            timer.start()
+        for genome, plane in active_genomes.items():
+                network = neat.nn.FeedForwardNetwork.create(genome, config)
+                nearest_rock = None
+                nearest_dist = None
+                plane_rect = plane.get_static_rect()
+                plane_rect.x, plane_rect.y = plane.get_real_pos()
+                plane_pos = plane_rect.midright
+                for rock in new_game.rocks:
+                    rock_pos = rock.get_rect().midleft
+                    dist = math.dist(rock_pos, plane_pos)
+                    if nearest_dist is None:
+                        nearest_rock = rock
+                        nearest_dist = dist
 
-        if network_timer.passed(.5):
-            for genome, plane in active_genomes.items():
-                    network = neat.nn.FeedForwardNetwork.create(genome, config)
-                    
-                    plane_y = plane.get_real_pos()[1]
-                    output = network.activate([plane_y])
-                    if output[0] > 0.5:
-                        plane.boost()
-        print(len(active_genomes))
+                    elif dist < nearest_dist:
+                        nearest_dist = dist
+                        nearest_rock = rock
+                plane_y = plane.get_real_pos()[1]
+                output = network.activate([plane_y, nearest_dist, plane.angle])
+                if output[0] > 0.5:
+                    plane.boost()
 
         new_game.update()
         
@@ -59,15 +68,5 @@ if __name__ == "__main__":
     neural_net.save_genome(winner, "best")
 
 
-# nearest_rock = None
-            # nearest_dist = None
-            # for rock in new_game.rocks:
-            #     dist = math.dist(rock.get_rect().center, plane.get_real_pos())
-            #     if nearest_dist is None:
-            #         nearest_rock = rock
-            #         nearest_dist = dist
 
-            #     elif dist < nearest_dist:
-            #         nearest_dist = dist
-            #         nearest_rock = rock 
             
