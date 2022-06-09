@@ -42,7 +42,7 @@ class Game:
     
     def config(self, plane_color="red", display_score=True, managed=False, num_planes=1):
         if plane_color:
-            Plane.IMAGE_NAME = "plane-" + plane_color
+            Plane.IMAGE_COLOR = plane_color
         self.managed = managed
         self.display_score = display_score
         self.num_planes = num_planes

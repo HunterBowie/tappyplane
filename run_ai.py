@@ -1,15 +1,23 @@
 import neat, math, random
 import game, windowgui, neural_net
 
+def move_by_degrees(angle, speed):
+    radians = math.radians(-angle) 
+    x, y = speed * math.cos(radians), speed * math.sin(radians)
+    return round(x), round(y)
+
 def fitness_function(genomes, config):
+    print(len(genomes))
+    if len(genomes) < 50:
+        genomes.append(random.choice(genomes))
     new_game = game.Game(game.window)
-    new_game.config(display_score=False, managed=True, num_planes=50)
+    new_game.config(display_score=False, managed=True, num_planes=50, plane_color="random")
     for genome_id, genome in genomes:
         genome.fitness = 0
 
 
     active_genomes = {}
-    print(len(new_game.planes), len(genomes))
+    
     for i in range(50):
         active_genomes[genomes[i][1]] = new_game.planes[i]
     new_game.running = True
@@ -29,23 +37,30 @@ def fitness_function(genomes, config):
 
         for genome, plane in active_genomes.items():
                 network = neat.nn.FeedForwardNetwork.create(genome, config)
-                nearest_rock = None
-                nearest_dist = None
-                plane_rect = plane.get_static_rect()
-                plane_rect.x, plane_rect.y = plane.get_real_pos()
-                plane_pos = plane_rect.midright
+                top_pos = plane.x, 0
+                bottom_pos = plane.x, game.window.screen.get_height()
+                top_height = 0
+                bottom_height = 0
+                top_dist = game.window.screen.get_width()*5
+                bottom_dist = game.window.screen.get_width()*5
                 for rock in new_game.rocks:
-                    rock_pos = rock.get_rect().midleft
-                    dist = math.dist(rock_pos, plane_pos)
-                    if nearest_dist is None:
-                        nearest_rock = rock
-                        nearest_dist = dist
+                    if rock.get_rect().center[0] > plane.x:
+                        if rock.direction == "up":
+                            dist = round(math.dist(bottom_pos, rock.get_rect().bottomleft))
 
-                    elif dist < nearest_dist:
-                        nearest_dist = dist
-                        nearest_rock = rock
+                            if dist < bottom_dist:
+                                bottom_dist = dist
+                                bottom_height = 239 if rock.size == "large" else 120
+                        else:
+                            dist = round(math.dist(top_pos, rock.get_rect().topleft))
+                                
+                            if dist < top_dist:
+                                top_dist = dist
+                                top_height = 239 if rock.size == "large" else 120
+                
+
                 plane_y = plane.get_real_pos()[1]
-                output = network.activate([plane_y, nearest_dist, plane.angle])
+                output = network.activate([plane_y, top_height, top_dist, bottom_height, bottom_dist])
                 if output[0] > 0.5:
                     plane.boost()
 
@@ -68,5 +83,18 @@ if __name__ == "__main__":
     neural_net.save_genome(winner, "best")
 
 
+# plane_rect = plane.get_static_rect()
+# plane_rect.x, plane_rect.y = plane.get_real_pos()
+# plane_pos = plane_rect.midright
+# for rock in new_game.rocks:
+#     rock_pos = rock.get_rect().midleft
+#     dist = math.dist(rock_pos, plane_pos)
+#     if nearest_dist is None:
+#         nearest_rock = rock
+#         nearest_dist = dist
+
+#     elif dist < nearest_dist:
+#         nearest_dist = dist
+#         nearest_rock = rock
 
             

@@ -1,6 +1,7 @@
 import pickle, os, neat
 import constants
 
+
 def init():
     local_dir = os.path.dirname(__file__)
     config_path = os.path.join(local_dir, constants.CONFIG_FILE)

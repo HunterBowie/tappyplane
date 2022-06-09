@@ -4,9 +4,14 @@ import game.assets as assets
 import windowgui
 
 class Plane:
-    IMAGE_NAME = "plane-red"
-
+    IMAGE_STEM = "plane-"
+    IMAGE_COLOR = "red"
     def __init__(self):
+        self.image_name = self.IMAGE_STEM
+        if self.IMAGE_COLOR == "random":
+            self.image_name = self.image_name + random.choice(["red","green","blue","yellow"])
+        else:
+            self.image_name = self.image_name + self.IMAGE_COLOR
         self.image_frame = 1
         self.mask = pygame.mask.from_surface(self.get_image())
         self.x = 50
@@ -26,7 +31,7 @@ class Plane:
         return rect
     
     def get_image(self):
-        return assets.IMAGES[self.IMAGE_NAME + "-" + str(self.image_frame)]
+        return assets.IMAGES[self.image_name + "-" + str(self.image_frame)]
     
     def get_real_pos(self):
         return self.x+self.angle_offset[0], self.y+self.angle_offset[1]
