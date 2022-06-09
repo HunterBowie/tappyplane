@@ -1,14 +1,15 @@
-import neat
+import neat, math
 import game, windowgui, neural_net
 
-
+config = neural_net.load_config()
 genome = neural_net.load_genome("best")
 network = neat.nn.FeedForwardNetwork.create(genome, config)
 
-def test():
+def run():
     new_game = game.Game(game.window)
     new_game.config(plane_color="red", display_score=False, managed=True)
-    plane = new_game.plane[0]
+    plane = new_game.planes[0]
+    new_game.running = True
     while new_game.running and game.window.running:
         top_pos = plane.x, 0
         bottom_pos = plane.x, game.window.screen.get_height()
@@ -38,9 +39,7 @@ def test():
             plane.boost()
         new_game.update()
 
-def run():
-    test()
-
 if __name__ == "__main__":
     game.window.start()
-    run()
+    while game.window.running:
+        run()

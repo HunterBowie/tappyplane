@@ -77,7 +77,7 @@ def fitness_function(genomes, config):
 
 if __name__ == "__main__":
     game.window.start()
-    population = neural_net.init()
+    population = neural_net.load_population()
     winner = population.run(fitness_function)
     print("success")
     neural_net.save_genome(winner, "best")
