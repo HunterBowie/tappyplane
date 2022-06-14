@@ -35,12 +35,12 @@ class Game:
         self.difficulty_timer = windowgui.Timer()
         self.difficulty_timer.start()
         self.cursor_timer = windowgui.Timer()
-        self._generate_rocks()
-        self.score = 0
-        self.config()
+        
+        self.score = 0        
         
     
-    def config(self, plane_color="red", display_score=True, managed=False, num_planes=1):
+    def config(self, plane_color="red", display_score=True, managed=False,
+     num_planes=1, terrain_simple=False):
         if plane_color:
             Plane.IMAGE_COLOR = plane_color
         self.managed = managed
@@ -49,6 +49,8 @@ class Game:
         self.planes.clear()
         for i in range(self.num_planes):
             self.planes.append(Plane())
+        self.terrain_simple = terrain_simple
+        self._generate_rocks()
     
     def reset(self):
         pass
@@ -65,9 +67,12 @@ class Game:
     def _generate_rocks(self):
         self.last_spawned_rocks.clear()
         choices = [1,1,1,1,2,2,2,2,3,4,5]
+        if self.terrain_simple:
+            choices = [1, 2]
         rand = random.choice(choices)
-        while rand == self.last_spawned_rock_num:
-            rand = random.choice(choices)
+        if not self.terrain_simple:
+            while rand == self.last_spawned_rock_num:
+                rand = random.choice(choices)
         rocks = []
         # small top, large bottom
         if rand == 1:

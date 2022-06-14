@@ -7,7 +7,7 @@ network = neat.nn.FeedForwardNetwork.create(genome, config)
 
 def run():
     new_game = game.Game(game.window)
-    new_game.config(plane_color="red", display_score=False, managed=True)
+    new_game.config(plane_color="red", display_score=False, managed=True, terrain_simple=True)
     plane = new_game.planes[0]
     new_game.running = True
     while new_game.running and game.window.running:

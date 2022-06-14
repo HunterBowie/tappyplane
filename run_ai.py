@@ -11,7 +11,8 @@ def fitness_function(genomes, config):
     if len(genomes) < 50:
         genomes.append(random.choice(genomes))
     new_game = game.Game(game.window)
-    new_game.config(display_score=False, managed=True, num_planes=50, plane_color="random")
+    new_game.config(display_score=False, managed=True, num_planes=50, plane_color="random",
+    terrain_simple=True)
     for genome_id, genome in genomes:
         genome.fitness = 0
 
@@ -34,6 +35,8 @@ def fitness_function(genomes, config):
             
         for genome, plane in active_genomes.items():
             genome.fitness += 1/game.window.max_fps
+            if genome.fitness > 60:
+                new_game.running = False
 
         for genome, plane in active_genomes.items():
                 network = neat.nn.FeedForwardNetwork.create(genome, config)
